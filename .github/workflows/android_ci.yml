@@ -42,10 +42,16 @@ jobs:
       working-directory: ./build
       run: cmake --build .
 
+    - name: Find Library
+      run: |
+        echo "Finding library location..."
+        find . -name "*.so" -type f
+
     - name: Package Build
       run: |
         mkdir -p artifacts
-        cp build/libGTInternal.so artifacts/
+        # Use find to locate and copy the .so file
+        find . -name "*.so" -type f -exec cp {} artifacts/ \;
         cd artifacts && zip -r GTInternal.zip *
 
     - name: Upload Build Artifact
