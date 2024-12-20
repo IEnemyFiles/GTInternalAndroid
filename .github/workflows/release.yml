@@ -49,16 +49,21 @@ jobs:
     - name: Package Release
       run: |
         mkdir -p release-artifacts
-        # Use find to locate and copy the .so file
+        # Copy source code
+        cp -r * release-artifacts/ || true
+        # Remove build directory from artifacts to save space
+        rm -rf release-artifacts/build
+        # Copy built .so files
         find . -name "*.so" -type f -exec cp {} release-artifacts/ \;
-        cd release-artifacts && zip -r GTInternal-${{ github.ref_name }}.zip *
+        # Create zip with everything
+        cd release-artifacts && zip -r GTInternal-${{ github.ref_name }}-full.zip *
 
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          release-artifacts/GTInternal-${{ github.ref_name }}.zip
+          release-artifacts/GTInternal-${{ github.ref_name }}-full.zip
           release-artifacts/*.so
         draft: false
         prerelease: false
@@ -67,10 +72,19 @@ jobs:
         body: |
           ## GTInternal Android Release ${{ github.ref_name }}
           
+          ### Files
+          - `GTInternal-${{ github.ref_name }}-full.zip`: Complete package with source code and built files
+          - `.so` file: Compiled library only
+          
           ### Installation
-          1. Download the `.so` file
+          1. Download the `.so` file or extract it from the full package
           2. Place it in the appropriate directory on your device
           
-          For the full package including all files, download `GTInternal-${{ github.ref_name }}.zip`
+          ### Development
+          For development, download the `GTInternal-${{ github.ref_name }}-full.zip` which includes:
+          - Full source code
+          - Built libraries
+          - CMake configuration
+          - All project files
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
