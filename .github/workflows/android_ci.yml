@@ -40,4 +40,17 @@ jobs:
 
     - name: Build
       working-directory: ./build
-      run: cmake --build . 
+      run: cmake --build .
+
+    - name: Package Build
+      run: |
+        mkdir -p artifacts
+        cp build/libGTInternal.so artifacts/
+        cd artifacts && zip -r GTInternal.zip *
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: GTInternal-build
+        path: artifacts/GTInternal.zip
+        retention-days: 7
