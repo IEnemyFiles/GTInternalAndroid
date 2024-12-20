@@ -50,13 +50,18 @@ jobs:
     - name: Package Build
       run: |
         mkdir -p artifacts
-        # Use find to locate and copy the .so file
+        # Copy source code
+        cp -r * artifacts/ || true
+        # Remove build directory from artifacts to save space
+        rm -rf artifacts/build
+        # Copy built .so files
         find . -name "*.so" -type f -exec cp {} artifacts/ \;
-        cd artifacts && zip -r GTInternal.zip *
+        # Create zip with everything
+        cd artifacts && zip -r GTInternal-full.zip *
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: GTInternal-build
-        path: artifacts/GTInternal.zip
+        name: GTInternal-full-package
+        path: artifacts/GTInternal-full.zip
         retention-days: 7
